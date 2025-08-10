@@ -1,0 +1,151 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden; 
+
+}
+body.modal-open {
+            padding-right: 0 !important;
+            overflow-y: scroll !important;
+        }
+.modal-open {
+        overflow-y: auto !important; 
+        padding-right: 0 !important;
+    }
+
+
+/* Navbar */
+.navbar {
+    background-color: #007bff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     margin-bottom: 0; /* Eliminar margen inferior */
+    padding: 0.5rem 1rem;   
+}
+.navbar-brand {
+    font-size: 1.5rem;
+    color: white !important;
+}
+.navbar-brand i {
+    color: #ffcc00;
+}
+.nav-link {
+    color: white !important;
+    transition: color 0.3s ease;
+}
+.nav-link:hover {
+    color: #ffcc00 !important;
+}
+
+/* Banner */
+/* Banner */
+.banner {
+    background: url('../images/banner.jpeg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 50vh; /* Altura mínima del banner */
+    width: 100vw; /* Ancho completo */
+    position: relative;
+    left: 50%; /* Centrado horizontal */
+    transform: translateX(-50%); /* Compensación del 50% del ancho */
+    z-index: 1;
+    margin: 0; /* Eliminar margen */
+    padding: 0; /* Eliminar padding */
+    box-sizing: border-box; /* Asegurar que el padding no afecte el ancho */
+    margin-top: -1px; /* Corregir cualquier espacio residual */
+}
+.banner h1 {
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.banner p {
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+.btn-primary {
+    background-color: #ffcc00;
+    border: none;
+    color: #007bff;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+.btn-primary:hover {
+    transform: scale(1.05);
+}
+
+/* Contenido principal */
+main {
+    background-color: transparent;
+    padding: 2rem;
+}
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+}
+
+.card img {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    height: 200px;
+    object-fit: cover;
+}
+.card-title {
+    color: #007bff;
+}
+
+/* Footer */
+footer {
+    background-color: #007bff;
+}
+footer small {
+    color: #ffcc00;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.banner {
+    animation: fadeIn 1.5s ease-in-out;
+}
+/* Asegura que el contenido principal ocupe al menos el 100% de la altura de la ventana */
+.d-flex.flex-column.min-vh-100 {
+    min-height: 100vh;
+}
+
+
+main.flex-grow-1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 6rem; 
+    padding-bottom: 4rem; 
+}
+
+
+.services-section {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.row.g-4.justify-content-center {
+    justify-content: center;
+}
+
+.col-md-4 {
+    flex: 0 0 auto; 
+    width: 100%;
+    max-width: 350px;
+}

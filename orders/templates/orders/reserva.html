@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Reserva | Lavado{% endblock %} 
+{% block content %}
+<style>
+    /* Solución al problema del desplazamiento */
+body, html {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto; /* Permite el scroll si es necesario */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE y Edge */
+}
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+</style>
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg rounded-3 overflow-hidden">
+                <div class="card-header bg-primary text-white text-center rounded-top">
+                    <h4 class="mb-0 fw-bold">Reserva tu Lavado</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="reservaForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">Nombre Completo</label>
+                            {{ form.nombre }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Correo Electrónico</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_telefono" class="form-label fw-bold">Teléfono</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+57</span>
+                                <input type="text" 
+                                       name="telefono" 
+                                       id="id_telefono" 
+                                       value="{{ form.telefono.value|default:'' }}"
+                                       class="form-control {% if form.telefono.errors %}is-invalid{% endif %}" 
+                                        placeholder="Número de teléfono"
+                                       required>
+                            </div>
+                            {% if form.telefono.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.telefono.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Ejemplo: 3001234567</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.servicio.id_for_label }}" class="form-label fw-bold">Servicio</label>
+                            {{ form.servicio }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.horario.id_for_label }}" class="form-label">Días y Horas Disponibles</label>
+                            {{ form.horario }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Reservar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary rounded-pill px-4">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const telefonoInput = document.getElementById('id_telefono');
+    const form = document.getElementById('reservaForm');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    // Limpiar el +57 si ya está al cargar
+    if (telefonoInput.value.startsWith('+57')) {
+        telefonoInput.value = telefonoInput.value.substring(3);
+    }
+
+    form.addEventListener('submit', function(e) {
+        // Prevenir doble envío
+        submitButton.disabled = true;
+        submitButton.innerText = 'Enviando...';
+
+        // Agregar +57 si no está
+        if (!telefonoInput.value.startsWith('+57')) {
+            telefonoInput.value = '+57' + telefonoInput.value;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+
+
+

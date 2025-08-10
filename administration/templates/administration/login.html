@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Iniciar Sesión | Lavado{% endblock %}
+{% block content %}
+<style>
+    .errorlist {
+        color: red;
+    }
+</style>
+
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h1>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-lock"></i> Acceso al Sistema</h4>
+                </div>
+                <div class="card-body">
+                    <form action="" method="post">{% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                Usuario o contraseña incorrectos, prueba de nuevo.
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label fw-bold">Nombre de Usuario</label>
+                            <input type="text" name="username" autofocus maxlength="254" required
+                                id="id_username" class="form-control" placeholder="Ingresa tu nombre de usuario" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label fw-bold">Contraseña</label>
+                            <input type="password" name="password" required
+                                id="id_password" class="form-control" placeholder="Ingresa tu contraseña" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-sign-in-alt"></i> Acceder</button>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{% url 'home' %}" class="btn btn-secondary"><i class="fas fa-home"></i> Volver al Inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

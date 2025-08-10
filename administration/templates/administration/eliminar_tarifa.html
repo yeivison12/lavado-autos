@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Eliminar Tarifa</h4>
+                </div>
+                <div class="card-body">
+                    <p>¿Estás seguro que deseas eliminar la tarifa <strong>"{{ object.nombre }}"</strong>?</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                        <a href="{% url 'listar_tarifas' %}" class="btn btn-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

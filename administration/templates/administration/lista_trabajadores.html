@@ -1,0 +1,373 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Encabezado  -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5 fw-bold"><i class="fas fa-users me-2 text-primary"></i>Lista de Trabajadores</h1>
+            <p class="text-muted">Gestiona y visualiza el estado de tus trabajadores</p>
+        </div>
+        <div class="d-flex">
+            
+            <button class="btn btn-outline-secondary" onclick="window.location.href='{% url 'exportar_trabajadores' %}'">
+                <i class="fas fa-download me-1"></i> Exportar
+            </button>
+        </div>
+    </div>
+
+    <!-- Panel de búsqueda y filtros -->
+<form method="get" class="row g-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="fas fa-search text-muted"></i>
+            </span>
+            <input type="text" name="q" class="form-control border-start-0"
+                   placeholder="Buscar por nombre o correo..." value="{{ q }}">
+        </div>
+    </div>
+    <div class="col-md-3">
+        <select name="estado" class="form-select">
+            <option value="" {% if not estado %}selected{% endif %}>Filtrar por estado</option>
+            <option value="conectado" {% if estado == 'conectado' %}selected{% endif %}>Conectado</option>
+            <option value="ocupado" {% if estado == 'ocupado' %}selected{% endif %}>Ocupado</option>
+            <option value="ausente" {% if estado == 'ausente' %}selected{% endif %}>Ausente</option>
+            <option value="desconectado" {% if estado == 'desconectado' %}selected{% endif %}>Desconectado</option>
+            <option value="hora de comida" {% if estado == 'hora de comida' %}selected{% endif %}>Hora de comida</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </div>
+</form>
+
+    <!-- Contador de trabajadores -->
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-sm btn-outline-secondary me-2" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" id="btn-lista" onclick="cambiarVista('lista')">
+                <i class="fas fa-list"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-cuadricula" onclick="cambiarVista('cuadricula')">
+                <i class="fas fa-th-large"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function cambiarVista(vista) {
+        const tabla = document.querySelector('.card .table-responsive');
+        const grid = document.getElementById('grid-trabajadores');
+        document.getElementById('btn-lista').classList.remove('active');
+        document.getElementById('btn-cuadricula').classList.remove('active');
+        if (vista === 'lista') {
+            tabla.style.display = '';
+            if (grid) grid.style.display = 'none';
+            document.getElementById('btn-lista').classList.add('active');
+        } else {
+            tabla.style.display = 'none';
+            if (grid) grid.style.display = '';
+            document.getElementById('btn-cuadricula').classList.add('active');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Por defecto, muestra la tabla y oculta la cuadrícula
+        cambiarVista('lista');
+    });
+    </script>
+
+    <!-- Verificar si hay trabajadores -->
+    {% if not trabajadores %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+            <h3 class="text-muted mb-3">No hay trabajadores registrados</h3>
+            <p class="text-muted mb-4">Comienza agregando nuevos trabajadores a tu equipo</p>
+        </div>
+    </div>
+    {% else %}
+    <!-- Tabla de Trabajadores mejorada -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="ps-">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Correo</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trabajador in trabajadores %}
+                    <tr>
+                        <th scope="row" class="ps-4">{{ forloop.counter }}</th>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    {% if trabajador.avatar %}
+                                    <img src="{{ trabajador.avatar.url }}" alt="Imagen" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="fas fa-user text-white" style="font-size: 14px;"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="fw-medium">{{ trabajador.user }} {{ trabajador.user.last_name }}</div>
+                                    <small class="text-muted">ID: TRB{{ forloop.counter|stringformat:"03d" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if trabajador.user.email %}
+                            <a href="mailto:{{ trabajador.user.email }}" class="text-decoration-none">
+                                {{ trabajador.user.email }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">Sin correo electrónico</span>
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            {% if trabajador.avatar %}
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}">
+                                Ver imagen
+                            </button>
+                            {% else %}
+                            <span class="badge bg-light text-dark">Sin imagen</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if trabajador.estado == 'ocupado' and trabajador.servicio_actual %}
+                                <div class="modal fade" id="servicioModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="servicioModalLabel{{ forloop.counter }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="servicioModalLabel{{ forloop.counter }}">En servicio Información del Servicio</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>Servicio:</strong> {{ trabajador.servicio_actual.servicio|capfirst }}</p>
+                                                <p><strong>Estado:</strong> {{ trabajador.servicio_actual.estado }}</p>
+                                            
+                                                <p><strong>Cliente:</strong> {{ trabajador.servicio_actual.nombre }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if trabajador.estado == 'ocupado' and trabajador.servicio_actual %}
+                                <button class="btn btn-sm btn-info ms-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#servicioModal{{ forloop.counter }}">
+                                    {{ trabajador.servicio_actual.servicio|capfirst }} ({{ trabajador.servicio_actual.nombre }})
+                                </button>
+
+                                {% elif trabajador.estado == 'conectado' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 py-1 px-2 rounded">
+                                    <i class="fas fa-circle text-success me-1" style="font-size: 6px;"></i> Conectado
+                                </span>
+                                {% elif trabajador.estado == 'ausente' %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 py-1 px-2 rounded">
+                                    <i class="fas fa-circle text-secondary me-1" style="font-size: 6px;"></i> Ausente
+                                </span>
+                                {% elif trabajador.estado == 'desconectado' %}
+                                <span class="badge bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25 py-1 px-2 rounded">
+                                    <i class="fas fa-circle text-dark me-1" style="font-size: 6px;"></i> Desconectado
+                                </span>
+                                {% elif trabajador.estado == 'hora de comida' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 py-1 px-2 rounded">
+                                    <i class="fas fa-utensils text-primary me-1"></i> Comida
+                                </span>
+                                {% else %}
+                                <span class="badge bg-light text-dark">
+                                    {{ trabajador.get_estado_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modales de imagen fuera de la tabla -->
+        {% for trabajador in trabajadores %}
+            {% if trabajador.avatar %}
+            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Imagen de {{ trabajador.user.first_name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ trabajador.avatar.url }}" alt="Imagen de {{ trabajador.user.first_name }}" class="img-fluid rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+<div id="grid-trabajadores" style="display:none;">
+    <div class="row">
+        {% for trabajador in trabajadores %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    {% if trabajador.avatar %}
+                        <img src="{{ trabajador.avatar.url }}" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:60px;height:60px;">
+                            <i class="fas fa-user text-white" style="font-size:24px;"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="card-title mb-1">{{ trabajador.user }} {{ trabajador.user.last_name }}</h5>
+                    <p class="card-text text-muted mb-2">{{ trabajador.user.email }}</p>
+                    <span class="badge bg-light text-dark">{{ trabajador.get_estado_display }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+        <!-- Pie de tabla con estadísticas -->
+        <div class="card-footer bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex">
+                        <div class="border-end pe-3 me-3">
+                            <small class="text-muted d-block">Conectados</small>
+                            <span class="fw-bold text-success">{{ conectados }}</span>
+                        </div>
+                        <div class="border-end pe-3 me-3">
+                            <small class="text-muted d-block">Ocupados</small>
+                            <span class="fw-bold text-warning">{{ ocupados }}</span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Ausentes</small>
+                            <span class="fw-bold text-secondary">{{ ausentes }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm justify-content-end mb-0">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            {% endif %}
+
+                            {% for i in paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Siguiente</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mensajes -->
+    {% if messages %}
+    <div class="mt-4">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    body, html {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto; /* Permite el scroll si es necesario */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE y Edge */
+}
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    .form-select, .form-control {
+        border-radius: 8px;
+    }
+    .btn {
+        border-radius: 8px;
+    }
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+    }
+    .btn-group .btn {
+        border-radius: 8px;
+    }
+    .btn-outline-primary, .btn-outline-success, .btn-outline-danger {
+        border-width: 1px;
+    }
+</style>
+
+<script>
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
+{% endblock %}

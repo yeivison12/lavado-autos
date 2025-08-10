@@ -1,0 +1,10 @@
+{
+  "SECRET_KEY": "django-insecure-h8a59fkl8*j4hu*g04269d9ts400h=t!kmr-&fohyz@wn+eh3d",
+  "DEBUG": true,
+  "EMAIL_BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+  "EMAIL_HOST": "smtp.gmail.com",
+  "EMAIL_PORT": 587,
+  "EMAIL_USE_TLS": true,
+  "EMAIL_HOST_USER": "Tu correo en el que creaste al app",
+  "EMAIL_HOST_PASSWORD": "Tu contraseña de smtp(https://www.youtube.com/watch?v=ShM8ufqsGlY)"
+}

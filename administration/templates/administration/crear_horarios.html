@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Crear Horario Disponible</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha</label>
+                            {{ form.fecha }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.hora.id_for_label }}" class="form-label">Hora</label>
+                            {{ form.hora }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.disponible.id_for_label }}" class="form-label">Disponible</label>
+                            {{ form.disponible }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Guardar</button>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{% url 'listar_horarios' %}" class="btn btn-secondary">Volver</a>
+     
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

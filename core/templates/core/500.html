@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Inicio | Lavado{% endblock %}
+{% block content %}
+<div class="error-page">
+    <h1>500</h1>
+    <h2>¡Error interno del servidor!</h2>
+    <p>Lo sentimos, ha ocurrido un error en el servidor.</p>
+    <a href="{% url 'home' %}">Volver a la página de inicio</a>
+</div>
+{% endblock %}
+
+{% block extra_css %}   <style>
+    .error-page {
+        text-align: center;
+        padding: 100px 20px;
+    }
+    .error-page h1 {
+        font-size: 100px;
+        margin: 0;
+    }
+    .error-page h2 {
+        font-size: 30px;
+        margin: 10px 0;
+    }
+    .error-page p {
+        font-size: 18px;
+    }
+</style>
+{% endblock extra_css %}
+{% endblock content %}      

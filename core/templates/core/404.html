@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Inicio | Lavado{% endblock %}
+{% block content %}
+<div class="error-page">
+    <h1>404</h1>
+    <h2>¡Página no encontrada!</h2>
+    <p>Lo sentimos, la página que estás buscando no existe.</p>
+    <a href="{% url 'home' %}">Volver a la página de inicio</a>
+</div>
+{% endblock %}

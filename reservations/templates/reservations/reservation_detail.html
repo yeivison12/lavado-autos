@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+{% load static %} 
+{% block title %}Detalles de la Reserva | Lavado{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Card de Detalles de la Reserva -->
+            <div class="card shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header bg-primary text-white text-center" style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h4 class="mb-0 fw-bold">Detalles de la Reserva</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <!-- Nombre del Cliente -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Nombre del Cliente:</strong>
+                            <span>{{ reserva.nombre|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Email -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Email:</strong>
+                            <span>{{ reserva.email|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Teléfono -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Teléfono:</strong>
+                            <span>{{ reserva.telefono|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Servicio Solicitado -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Servicio Solicitado:</strong>
+                            <span>{{ reserva.servicio.nombre|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Fecha de la Reserva -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Fecha de la Reserva:</strong>
+                            <span>{{ reserva.horario.fecha|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Hora de la Reserva -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Hora de la Reserva:</strong>
+                            <span>{{ reserva.horario.hora|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Estado -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Estado:</strong>
+                            <span 
+                                class="badge rounded-pill px-3 py-2" 
+                                style="
+                                    font-weight: bold;
+                                    background-color: 
+                                        {% if reserva.estado == 'pendiente' %}#F4A261
+                                        {% elif reserva.estado == 'cancelado' %}#E76F51
+                                        {% elif reserva.estado == 'confirmado' %}#2A9D8F
+                                        {% endif %}; 
+                                    color: white;"
+                            >
+                                {{ reserva.get_estado_display|default:"N/A" }}
+                            </span>
+                        </li>
+                        
+                        <!-- Código de Reserva -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Código de Reserva:</strong>
+                            <span>{{ reserva.token|default:"N/A" }}</span>
+                        </li>
+                        
+                        <!-- Fecha de Creación -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Fecha de Creación:</strong>
+                            <span>{{ reserva.fecha_creacion|default:"N/A" }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">Volver al Inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

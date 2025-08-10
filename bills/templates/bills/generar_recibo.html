@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+{% block content %}
+    <h2>Generar Recibo</h2>
+    <p>Cliente: {{ reserva.nombre }}</p>
+    <p>Servicio: {{ reserva.get_servicio_display }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generar Recibo</button>
+    </form>
+    <button id="backButton" class="btn btn-secondary"  onclick="window.history.back()">Volver</button>
+
+{% endblock %}

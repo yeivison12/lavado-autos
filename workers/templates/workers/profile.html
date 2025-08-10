@@ -1,0 +1,101 @@
+{% extends "core/base.html" %}
+{% block content %}
+<!-- Main Content -->
+<main class="flex-grow-1 py-0 d-flex flex-column justify-content-center">
+  <section class="container py-5 services-section">
+    <div class="row g-4 justify-content-center">
+      <!-- Panel de Perfil -->
+      <div class="col-md-4">
+        <div class="card text-center shadow-lg border-0 rounded-3">
+          <div class="card-body p-4">
+            <div class="mb-3">
+                {% if worker.avatar %}
+                <img src="{{ worker.avatar.url }}" alt="Avatar" class="img-fluid rounded-circle border border-3 border-primary" style="width: 130px; height: 130px;">
+              {% else %}
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" alt="Avatar" class="img-fluid rounded-circle border border-3 border-primary" style="width: 130px; height: 130px;">
+              {% endif %}
+            </div>
+            <h4 class="fw-bold text-primary card-title">{{ worker.user.username }}</h4>
+            <p class="text-secondary fw-semibold">{{ worker.get_estado_display }}</p>
+            <p class="text-muted small">{{ worker.bio|default:"Sin biografía" }}</p>
+            <a href="{% url 'worker_profile_edit' %}" class="btn btn-outline-primary btn-sm fw-semibold">Editar Perfil</a>
+          </div>
+        </div>
+      </div>
+      <!-- Información General -->
+      <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-3">
+          <div class="card-body p-4">
+            <h5 class="fw-bold text-dark card-title">Información Personal</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item border-0"><strong class="text-primary">Email:</strong> {{ worker.user.email }}</li>
+              <li class="list-group-item border-0"><strong class="text-primary">Estado:</strong> {{ worker.get_estado_display }}</li>
+              <li class="list-group-item border-0"><strong class="text-primary">Nombre:</strong> {{ worker.user.username }}</li>
+              {% if worker.servicio_actual %}
+              <li class="list-group-item border-0"><strong class="text-primary">Servicio actual:</strong> {{ worker.servicio_actual }}</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+        <!-- Historial de Trabajos -->
+        <div class="card mt-4 shadow-lg border-0 rounded-3">
+          <div class="card-body p-4">
+            <h5 class="fw-bold text-dark card-title">Historial de Trabajos</h5>
+            {% if reservas %}
+              <ul class="list-group list-group-flush">
+                {% for reserva in reservas %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                    <span class="fw-semibold">{{ reserva.servicio }} - {{ reserva.horario.fecha }} {{ reserva.horario.hora }}</span>
+                    <span class="badge bg-success text-white fw-semibold px-3 py-2">{{ reserva.get_estado_display }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+              <!-- Paginación -->
+              <nav aria-label="Paginación" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  {% if page_obj.has_previous %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if num != 1 or page_obj.paginator.num_pages > 1 %}
+                      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                  {% if page_obj.has_next %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
+            {% else %}
+              <p class="text-muted">No hay trabajos realizados.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<style>
+    /* Solución al problema del desplazamiento */
+body, html {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto; /* Permite el scroll si es necesario */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE y Edge */
+}
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+</style>
+{% endblock %}

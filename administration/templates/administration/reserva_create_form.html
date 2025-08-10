@@ -1,0 +1,72 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1><i class="fas fa-calendar-plus"></i> Crear Reserva</h1>
+        </div>
+    </div>
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-bookmark"></i> Nueva Reserva</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                       
+                        <div class="mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">Nombre</label>
+                            {{ form.nombre }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email</label>
+                            {{ form.email }}
+                        </div>
+                      
+                        <div class="mb-3">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label fw-bold">Teléfono</label>
+                            {{ form.telefono }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.servicio.id_for_label }}" class="form-label fw-bold">Servicio</label>
+                            {{ form.servicio }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.horario.id_for_label }}" class="form-label fw-bold">Horario</label>
+                            {{ form.horario }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label fw-bold">Estado</label>
+                            {{ form.estado }}
+                        </div>
+                       
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> Guardar Reserva</button>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{% url 'listaAdmon' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mensajes de Éxito o Error -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

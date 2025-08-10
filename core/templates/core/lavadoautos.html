@@ -1,0 +1,216 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Inicio | Lavado{% endblock %}
+
+
+{% block content %}
+
+    <!-- Banner Principal -->
+    <section class="banner d-flex align-items-center justify-content-center text-white">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Lava tu auto con estilo</h1>
+            <p class="lead">El mejor servicio de lavado de autos en la ciudad.</p>
+            <a href="{% url 'reservation' %}" class="btn btn-primary btn-lg rounded-pill px-5">Reservar ahora</a>
+        </div>
+    </section>
+
+<!-- Modal de Reserva Exitosa -->
+{% if 'success' in request.GET %}
+<div class="modal fade show" id="reservaExitosaModal" tabindex="-1" aria-labelledby="reservaExitosaModalLabel" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservaExitosaModalLabel">¡Reserva Exitosa!</h5>
+                <a href="{% url 'home' %}" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+                <p>Gracias por reservar con nosotros. Nos pondremos en contacto contigo pronto.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'reservation' %}" class="btn btn-primary">Hacer otra reserva</a>
+                <a href="{% url 'verificar' %}" class="btn btn-primary">verificar reserva</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if 'error' in request.GET %}
+<div class="modal fade show" id="errorCorreoModal" tabindex="-1" aria-labelledby="errorCorreoModalLabel" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorCorreoModalLabel">¡Error al Enviar el Correo!</h5>
+                <a href="{% url 'home' %}" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+                <p>Hubo un problema al intentar enviar el correo de confirmación. Por favor, inténtalo nuevamente o contáctanos para más información.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'reservation' %}" class="btn btn-primary">Reintentar Reserva</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if 'logout' in request.GET %}
+<!-- Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"> <!-- Clase para centrar el modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Cierre de Sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-sign-out-alt"></i> Has cerrado sesión correctamente. ¡Hasta pronto!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        logoutModal.show();
+    });
+</script>
+{% endif %}
+
+
+<!-- Sección de Servicios -->
+<section id="servicios" class="services-section container pt-4">
+    <h2 class="text-center mb-5">Nuestros Servicios</h2>
+    <div class="row g-4 justify-content-center">
+        {% for servicio in primeros_tres %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ servicio.nombre }}</h5>
+                    <p class="card-text flex-grow-1">{{ servicio.descripcion|truncatechars:100 }}</p>
+                    <p class="card-text fw-bold">
+                        {{ servicio.monto|default:"Por definir" }}
+                    </p>
+                    <button class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#modalServicio{{ servicio.id }}">Más Información</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal individual -->
+        <div class="modal fade" id="modalServicio{{ servicio.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ servicio.nombre }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ servicio.descripcion }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if restantes %}
+    <div class="text-center mt-4">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalTodosServicios">
+            Ver todos los servicios
+        </button>
+    </div>
+    {% endif %}
+</section>
+
+<style>
+    /* Solución al problema del desplazamiento */
+body, html {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto; /* Permite el scroll si es necesario */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE y Edge */
+}
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+
+    
+    /* Estilos adicionales */
+    .banner {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), url('{% static 'core/images/car-wash-banner.jpg' %}');
+        background-size: cover;
+        background-position: center;
+        height: 80vh;
+        position: relative;
+    }
+    
+    .premium-card {
+        transform: scale(1.05);
+        box-shadow: 0 0.5rem 1rem rgba(255, 193, 7, 0.3) !important;
+        border: 2px solid #ffc107 !important;
+        z-index: 2;
+    }
+    
+    .service-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .carho {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .carho:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+<!-- Modales de información de servicios -->
+{% if restantes %}
+<div class="modal fade" id="modalTodosServicios" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Todos los Servicios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    {% for servicio in restantes %}
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}" style="height: 150px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ servicio.nombre }}</h5>
+                                <p class="card-text">{{ servicio.descripcion|truncatechars:120 }}</p>
+                                <p class="card-text fw-bold">
+                                    {{ servicio.monto|default:"Por definir" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<script>
+document.addEventListener('show.bs.modal', function () {
+    document.body.style.paddingRight = '0';
+});
+document.addEventListener('hidden.bs.modal', function () {
+    document.body.style.paddingRight = '';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends "core/base.html" %}
+{% block content %}
+{% if messages %}
+    <div id="alert-container" class="position-fixed" style="top: 7rem; right: 1rem; z-index: 1050; max-width: 400px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center shadow-lg px-4 py-3 fw-bold" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 3000); // Desaparece en 3 segundos
+    </script>
+{% endif %}
+{% if 'sendemail' in request.GET %}
+<!-- Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Factura enviada correctamente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <i class=""></i> has enviado la factura correctamente. ¡Gracias por tu trabajo!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        logoutModal.show();
+    });
+</script>
+{% endif %}
+
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="display-6 fw-bold">Panel de Control del Trabajador</h1>
+    </div>
+
+    <!-- Tarjeta de estado del trabajador -->
+    <div class="card mb-4 border-primary shadow-sm">
+        <div class="card-body">
+            {% if worker.estado == 'hora de comida' %}
+            <h5 class="card-title text-danger">Estado Actual: {{ worker.get_estado_display }}</h5>
+            <form method="post" action="{% url 'cambiar_estado' %}" class="mt-2">
+                {% csrf_token %}
+                <input type="hidden" name="estado" value="conectado">
+                <button type="submit" class="btn btn-primary">Salir de Hora de Comida</button>
+            </form>
+            {% elif worker.estado == 'ocupado' %}
+            <h5 class="card-title text-success">Estado Actual: {{ worker.get_estado_display }}</h5>
+            <h6 class="text-danger">Termina tu servicio para poder ir a comer</h6>
+            {% else %}
+            <h5 class="card-title text-success">Estado Actual: {{ worker.get_estado_display }}</h5>
+            <form method="post" action="{% url 'cambiar_estado' %}">
+                {% csrf_token %}
+                <input type="hidden" name="estado" value="hora de comida">
+                <button type="submit" class="btn btn-warning">Activar Hora de Comida</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pestañas con diseño mejorado -->
+    <ul class="nav nav-pills nav-fill mb-4 shadow-sm bg-white rounded" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pendientes-tab" data-bs-toggle="tab" data-bs-target="#pendientes" type="button" role="tab" aria-controls="pendientes" aria-selected="true">
+                Órdenes Pendientes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completadas-tab" data-bs-toggle="tab" data-bs-target="#completadas" type="button" role="tab" aria-controls="completadas" aria-selected="false">
+                Órdenes Completadas
+            </button>
+        </li>
+    </ul>
+{% if messages %}
+    <div id="alert-container" class="position-fixed" style="top: 7rem; right: 1rem; z-index: 1050; max-width: 400px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center shadow-lg px-4 py-3 fw-bold" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="tab-content" id="myTabContent">
+        <!-- Pestaña Pendientes -->
+        <div class="tab-pane fade show active" id="pendientes" role="tabpanel" aria-labelledby="pendientes-tab">
+            {% if reserva_actual %}
+            <div class="card mb-4 border-primary shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{{ reserva_actual.nombre }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Servicio:</strong> {{ reserva_actual.servicio }}</p>
+                    <p class="mb-1"><strong>Horario:</strong> {{ reserva_actual.horario }}</p>
+                    <p class="mb-3"><strong>Estado:</strong> 
+                        <span class="badge bg-info text-dark">{{ reserva_actual.get_estado_display }}</span>
+                    </p>
+                    <div class="d-flex gap-2">
+                        <form method="post" action="{% url 'completar_orden' reserva_actual.id %}" onsubmit="return confirm('¿Estás seguro de que quieres marcar esta reserva como completada?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Marcar como Completada</button>
+                        </form>
+                        <form method="post" action="{% url 'cancelar_orden' reserva_actual.id %}" onsubmit="return confirm('¿Estás seguro de que quieres cancelar esta reserva?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger">Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <h4 class="mb-3">Lista de Órdenes Pendientes</h4>
+            <div class="list-group">
+                {% for reserva in reservas_pendientes %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start shadow-sm mb-2 rounded">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ reserva.nombre }}</h5>
+                        <small class="text-muted">{{ reserva.horario }}</small>
+                    </div>
+                    <p class="mb-1"><strong>Servicio:</strong> {{ reserva.servicio }}</p>
+                    
+                    {% if reserva.trabajador %}
+                    <p class="mb-1"><strong>Tomado por:</strong> {{ reserva.trabajador.user.username }}</p>
+                    {% else %}
+                    {% if worker.esta_disponible %}
+                    <form method="post" action="{% url 'aceptar_orden' reserva.id %}" onsubmit="return confirm('¿Estás seguro de que quieres aceptar esta reserva?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success btn-sm mt-2">Aceptar Orden</button>
+                    </form>
+                    {% elif worker.estado == 'hora de comida' %}
+                    <p class="text-danger mt-2">No puedes aceptar nuevas órdenes hasta que salgas de tu hora de comida.</p>
+                    {% else %}
+                    <p class="text-danger mt-2">No puedes aceptar nuevas órdenes hasta que completes la actual.</p>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="list-group-item">
+                    <p class="text-center text-muted">No hay órdenes pendientes en este momento</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pestaña Completadas -->
+        <div class="tab-pane fade" id="completadas" role="tabpanel" aria-labelledby="completadas-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Órdenes Completadas</h4>
+                <form method="get" action="{% url 'worker_dashboard' %}" class="d-flex">
+                    <input type="text" class="form-control form-control-sm me-2" name="q" placeholder="Buscar por nombre, fecha o UID" value="{{ request.GET.q }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <div class="list-group mb-4">
+                {% for reserva in page_obj %}
+                <div class="list-group-item shadow-sm mb-2 rounded d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ reserva.nombre }}</h5>
+                        <p class="mb-1"><strong>Servicio:</strong> {{ reserva.servicio }}</p>
+                        <p class="mb-1"><strong>Horario:</strong> {{ reserva.horario }}</p>
+                        <p class="mb-0"><strong>Estado:</strong> 
+                            <span class="badge bg-success">{{ reserva.get_estado_display }}</span>
+                        </p>
+                    </div>
+                    <div>
+                        {% if reserva.estado == "completado" %}
+                        {% if reserva.recibo %}
+                        <a href="{% url 'ver_recibo' reserva.recibo.id %}" class="btn btn-sm btn-outline-secondary">Ver Recibo</a>
+                        {% else %}
+                        <a href="{% url 'generar_recibo' reserva.id %}" class="btn btn-sm btn-primary">Generar Recibo</a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item">
+                    <p class="text-center text-muted">No hay órdenes completadas</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if num != 1 or page_obj.paginator.num_pages > 1 %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        background-color:rgb(147, 149, 151);
+        color:rgb(0, 0, 0);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-pills .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card {
+        border-radius: 0.5rem;
+    }
+    
+    .list-group-item {
+        transition: transform 0.2s;
+    }
+    
+   
+</style>
+
+<script>
+    // Guardar la pestaña activa en localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+        var myTab = document.getElementById('myTab');
+        var tabButtons = myTab.querySelectorAll('button[data-bs-toggle="tab"]');
+        
+        tabButtons.forEach(function(button) {
+            button.addEventListener('shown.bs.tab', function(event) {
+                localStorage.setItem('activeTab', event.target.id);
+            });
+        });
+        
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            var activeTabButton = document.getElementById(activeTab);
+            new bootstrap.Tab(activeTabButton).show();
+        }
+    });
+</script>
+{% endblock %}

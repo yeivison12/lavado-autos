@@ -1,0 +1,175 @@
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+    }
+    .factura-container {
+        max-width: 800px;
+        margin: auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #ddd;
+    }
+    .logo {
+        width: 150px;
+    }
+    .cliente-info {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #fafafa;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    .total {
+        text-align: right;
+        margin-top: 20px;
+        font-size: 1.1em;
+    }
+    .total strong {
+        font-size: 1.2em;
+        color: #333;
+    }
+    .footer {
+        margin-top: 40px;
+        border-top: 2px solid #ddd;
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .info-pago, .contacto {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+    .info-pago h4, .contacto h4 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+    .info-pago p, .contacto p {
+        margin: 5px 0;
+        color: #555;
+    }
+    .gracias {
+        text-align: center;
+        margin-top: 20px;
+        font-style: italic;
+        color: #777;
+    }
+</style>
+
+<meta charset="UTF-8">
+
+<div class="factura-container">
+    <!-- Encabezado -->
+    <div class="header">
+        <div>
+            <h2 style="margin: 0; color: #333;">FACTURA</h2>
+            <p style="margin: 5px 0; color: #555;">Factura n°: <strong>{{ recibo.id }}</strong></p>
+            <p style="margin: 5px 0; color: #555;">Fecha: <strong>{{ recibo.fecha_emision|date:"d/m/Y" }}</strong></p>
+        </div>
+     
+    </div>
+{% if messages %}
+<script>
+    {% for message in messages %}
+        alert("{{ message|escapejs }}");
+    {% endfor %}
+</script>
+{% endif %}
+
+    <!-- Información del Cliente -->
+    <div class="cliente-info">
+        <h3 style="margin: 0 0 10px; color: #333;">{{ recibo.reserva.nombre }}</h3>
+        <p style="margin: 5px 0; color: #555;">Teléfono: <strong>{{ recibo.reserva.telefono }}</strong></p>
+        <p style="margin: 5px 0; color: #555;">Servicio: <strong>{{ recibo.reserva.servicio.nombre }}</strong></p>
+        <p style="margin: 5px 0; color: #555;">Precio: <strong>${{ recibo.monto }}</strong></p>
+        {%if recibo.comentario%}
+        <p style="margin: 5px 0; color: #555;">Comentario del trabajador: <strong>{{ recibo.comentario }}</strong></p>
+        {%endif%}
+        <p style="margin: 5px 0; color: #555;">Trabajador asignado: <strong>{{ recibo.trabajador.user.username }}</strong></p>
+
+    </div>
+
+    <!-- Tabla de Artículos -->
+    <table>
+        <thead>
+            <tr>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Servicio: {{ recibo.reserva.servicio.nombre }}</td>
+                <td>1</td>
+                <td>${{ recibo.monto }}</td>
+                <td>${{ recibo.monto }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="text-align: right;">Subtotal:</td>
+                <td>${{ recibo.monto }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;">Impuestos (0%):</td>
+                <td>$0</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;">Total:</td>
+                <td><strong>${{ recibo.monto }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Mensaje de Agradecimiento -->
+    <div class="gracias">
+        <p>¡Gracias por su compra! Esperamos verlo de nuevo pronto.</p>
+    </div>
+{% if not is_pdf %}
+    <form id="pdfForm" action="{% url 'generar_pdf' recibo.id %}" method="post" class="no-print">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Generar PDF y Enviar por Correo</button>
+    </form>
+
+    <script>
+        document.getElementById('pdfForm').addEventListener('submit', function(event) {
+            const confirmacion = confirm("¿Estás seguro de que deseas generar el PDF y enviar el correo?");
+            if (!confirmacion) {
+                event.preventDefault(); // cancela el envío si no confirma
+            }
+        });
+    </script>
+
+    <!--<a href="{% url 'actualizar_recibo' recibo.id %}" class="btn btn-secondary">Actualizar</a>-->
+    <a href="{% url 'worker_dashboard'%}" class="btn btn-secondary">Ir al Panel</a>
+{% endif %}
+
+</div>

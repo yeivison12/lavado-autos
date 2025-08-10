@@ -1,0 +1,215 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1><i class="fas fa-calendar-check"></i> Lista de Reservas</h1>
+        </div>
+    </div>
+
+    <!-- Botón para Crear Nueva Reserva -->
+    <div class="row mb-3">
+        <div class="col-12 text-end">
+            <a href="{% url 'reserva_create' %}" class="btn btn-primary w-100"><i class="fas fa-plus"></i> Crear Nueva Reserva</a>
+        </div>
+    </div>
+
+<!-- Formulario de Búsqueda y Filtro -->
+<div class="row mb-3">
+    <div class="col-12">
+        <form method="GET" class="row g-2">
+            <!-- Campo de búsqueda -->
+            <div class="col-md-6">
+                
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="form-control" 
+                    placeholder="Buscar por nombre, teléfono o estado" 
+                    value="{{ query }}" 
+                    {% if estado %}disabled{% endif %}
+                >
+            </div>
+            <!-- Filtro por estado -->
+            <div class="col-md-4">
+                <select name="estado" class="form-select">
+                    <option value="" {% if not estado %}selected{% endif %}>Todos los Estados</option>
+                    <option value="pendiente" {% if estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="confirmado" {% if estado == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                    <option value="completado" {% if estado == 'completado' %}selected{% endif %}>Completado</option>
+                    <option value="cancelado" {% if estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+            <!-- Botón de búsqueda -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% if query or estado %}
+<div class="text-end mb-3">
+    <a href="{% url 'listaAdmon' %}" class="btn btn-outline-secondary btn-sm">Limpiar filtros</a>
+</div>
+{% endif %}
+    <!-- Mensajes de Error o Bienvenida -->
+    {% if 'error' in request.GET %}
+    <div class="modal fade show" id="errorCorreoModal" tabindex="-1" aria-labelledby="errorCorreoModalLabel" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorCorreoModalLabel">¡Error al Enviar el Correo!</h5>
+                    <a href="{% url 'listaAdmon' %}" class="btn-close"></a>
+                </div>
+                <div class="modal-body">
+                    <p>Hubo un problema al intentar enviar el correo de notificación o seleccionaste una fecha no disponible. Por favor, inténtalo nuevamente o contáctanos para más información.</p>
+                    {% if messages %}
+                    <div class="container mt-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if 'login' in request.GET %}
+    <div class="modal fade show" id="bienvenidaModal" tabindex="-1" aria-labelledby="bienvenidaModalLabel" style="display: block; background-color: rgba(0, 0, 0, 0.7);">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+            <div class="modal-content border-0 shadow-lg">
+                <!-- Encabezado -->
+                <div class="modal-header bg-primary text-white rounded-top">
+                    <h5 class="modal-title fw-bold" id="bienvenidaModalLabel">¡Bienvenido al Sistema de Lavado de Autos Medellín!</h5>
+                    <a href="{% url 'home' %}" class="btn-close btn-close-white"></a>
+                </div>
+                <!-- Cuerpo -->
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-car-side fa-3x text-primary mb-3"></i>
+                    <p class="mb-0 fw-medium">
+                        Hola, <strong>{{ request.user.first_name|default:request.user.username }}</strong>.<br>
+                        Bienvenido nuevamente al sistema. Estamos listos para ayudarte.
+                    </p>
+                </div>
+                <!-- Pie de página -->
+                <div class="modal-footer justify-content-center border-0">
+                    <a href="{% url 'listaAdmon' %}" class="btn btn-outline-primary me-2 w-100">Ir al Panel</a>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary w-100">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Verificar si hay resultados -->
+    {% if not object_list %}
+    <div class="alert alert-warning text-center" role="alert">
+        No se encontraron coincidencias para: <strong>{{ query }}</strong>.
+    </div>
+    {% else %}
+    <!-- Tabla de Reservas -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Teléfono</th>
+                    <th scope="col">Servicio</th>
+                    <th scope="col">Horario</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in object_list %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ reserva.nombre }}</td>
+                    <td>{{ reserva.telefono }}</td>
+                    <td>
+                        {% if reserva.servicio %}
+                         <span class="badge bg-info">{{ reserva.servicio.nombre }}</span>
+                        {% else %}
+                         <span class="badge bg-secondary">No definido</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ reserva.horario.fecha }} - {{ reserva.horario.hora }}</td>
+                    <td>
+                     
+                        {% if reserva.estado == 'pendiente' %}
+                        <span class="badge bg-secondary">Pendiente</span>
+                        {% elif reserva.estado == 'completado' %}
+                        <span class="badge bg-primary">Completado</span>
+                        {% elif reserva.estado == 'confirmado' %}
+                        <span class="badge bg-success">Confirmado</span>
+                        {% elif reserva.estado == 'cancelado' %}
+                        <span class="badge bg-danger">Cancelado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'reserva_detail' reserva.token %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                        <a href="{% url 'reserva_edit' reserva.id %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'reserva_delete' reserva.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center pagination-sm">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">Anterior</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+            </li>
+            {% endif %}
+
+            {% for i in paginator.page_range %}
+            <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">{{ i }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">Siguiente</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Siguiente</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+  <h2>Actualizar Recibo</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+  </form>
+  <a href="{% url 'ver_recibo' recibo.id %}" class="btn btn-secondary">Cancelar</a>
+{% endblock %}
