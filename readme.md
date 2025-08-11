@@ -75,11 +75,11 @@ Incluye un **panel de control moderno** con Bootstrap, envío de correos de conf
 
   
 
-- pip (gestor de paquetes de Python)
+- pip 
 
   
 
-- Git (opcional, para clonar el repositorio)
+- Git 
 
 - Tener una cuenta de google para acceder al smtp de gmail
 
