@@ -107,7 +107,7 @@ Incluye un **panel de control moderno** con Bootstrap, envío de correos de conf
 
   
 
-git  clone  https://github.com/usuario/lavado-autos.git
+git  clone  https://github.com/yeivison12/lavado-autos.git
 
   
 
