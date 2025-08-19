@@ -20,9 +20,9 @@ class Tarifa(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     imagen = models.ImageField(upload_to='tarifas/', blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    activo = models.BooleanField(default=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     historial = HistoricalRecords()
     
     def __str__(self):
         return f"{self.nombre} - ${self.monto}"
-
