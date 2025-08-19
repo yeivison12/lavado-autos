@@ -148,7 +148,7 @@ pip  install  -r  requirements.txt
 # Migrar base de datos
 
   
-python manage.py makemigratios
+python manage.py makemigrations
 
 python  manage.py  migrate
 
