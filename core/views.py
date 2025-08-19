@@ -10,16 +10,18 @@ class Home(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Tarifa a diccionaria
+        # Solo tarifas activas
+        servicios_activos = Tarifa.objects.filter(activo=True)
+
+        # Diccionario de precios
         context['precios'] = {
             unicodedata.normalize('NFKD', t.nombre).encode('ascii', 'ignore').decode().lower().replace(' ', '_'): t.monto
-            for t in Tarifa.objects.all()
+            for t in servicios_activos
         }
 
         # Servicios
-        servicios = Tarifa.objects.all()
-        context['primeros_tres'] = servicios[:3]
-        context['restantes'] = servicios[3:] if servicios.count() > 3 else []
+        context['primeros_tres'] = servicios_activos[:3]
+        context['restantes'] = servicios_activos[3:] if servicios_activos.count() > 3 else []
 
         return context
 
