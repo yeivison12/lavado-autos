@@ -63,9 +63,3 @@ class CrearTarifaForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
             'imagen': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
-    
-    def clean_nombre(self):
-        nombre = self.cleaned_data['nombre'].lower()
-        if Tarifa.objects.filter(nombre=nombre).exists():
-            raise forms.ValidationError("Ya existe una tarifa con este nombre.")
-        return nombre
