@@ -1,4 +1,5 @@
 import csv
+from urllib.parse import urlencode
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -18,6 +19,9 @@ from django.db import models
 from datetime import datetime
 from django.utils.translation import gettext as _
 from workers.models import Worker
+from django.db.models.deletion import ProtectedError
+from django.shortcuts import redirect
+from urllib.parse import urlencode
 from .validators import validate_month, validate_day, validate_state, validate_date_format
 from PIL import Image, ImageDraw, ImageFont
 import io
@@ -150,17 +154,16 @@ class ListarTarrifas(LoginRequiredMixin, AdminRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q', '')
         return context
-class EditarTarifaView(UpdateView):
+class EditarTarifaView(UpdateView,AdminRequiredMixin):
     model = Tarifa
     form_class = CrearTarifaForm
     template_name = 'administration/editar_tarifa.html'
     success_url = reverse_lazy('listar_tarifas')
 
-class EliminarTarifaView(DeleteView):
+'''class EliminarTarifaView(DeleteView,AdminRequiredMixin):
     model = Tarifa
     template_name = 'administration/eliminar_tarifa.html'
-    success_url = reverse_lazy('listar_tarifas')
-
+    success_url = reverse_lazy('listar_tarifas')'''
 # Vista para actualizar un horario existente
 class ActualizarHorarioView(LoginRequiredMixin,SuccessMessageMixin,AdminRequiredMixin, UpdateView):
     model = HorarioDisponible
