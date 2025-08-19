@@ -123,7 +123,16 @@ def enviar_correo_confirmacion(sender, instance, created, **kwargs):
 
     if asunto and mensaje:
         try:
-            send_mail(asunto, mensaje, EMAIL_HOST_USER, [instance.email])
+            from django.core.mail import EmailMessage
+
+            email = EmailMessage(
+                subject=asunto,
+                body=mensaje,
+                from_email=EMAIL_HOST_USER,
+                to=[instance.email],
+            )
+            email.encoding = 'utf-8'
+            email.send()
         except Exception as e:
             print(f"ERROR enviando correo: {e}")
             raise EmailSendingError("Error al enviar el correo electrónico.")
