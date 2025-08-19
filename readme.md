@@ -148,21 +148,15 @@ pip  install  -r  requirements.txt
 # Migrar base de datos
 
   
+python manage.py makemigratios
 
 python  manage.py  migrate
 
-  
-
-  
 
 # Crear superusuario
-
-  
-
 python  manage.py  createsuperuser
 
   
-
   
 
 # Ejecutar el servidor
