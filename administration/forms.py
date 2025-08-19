@@ -56,10 +56,11 @@ class HorarioDisponibleForm(forms.ModelForm):
 class CrearTarifaForm(forms.ModelForm):
     class Meta:
         model = Tarifa
-        fields = ['nombre', 'monto', 'descripcion', 'imagen']
+        fields = ['nombre', 'monto', 'descripcion', 'imagen', 'activo']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'monto': forms.NumberInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
             'imagen': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
