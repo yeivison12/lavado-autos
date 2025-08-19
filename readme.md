@@ -177,6 +177,10 @@ funcionamiento,  cuando  crees  usuarios,  debes  ponerlos  en  el  grupo
 
 trabajadores  para  que  puedan  acceder  y  limitar  sus  funciones  solo  a  la  de  trabajadores
 
+# Luego debes acceder al panel de administración
+Video explicativo:https://www.youtube.com/watch?v=8TQex-TmnQw
+
+
 # Diagrama de flujo
 ```mermaid
 flowchart  TD
