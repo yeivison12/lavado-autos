@@ -3,7 +3,6 @@ from django.contrib.auth import views as auth_views
 from .views import (
     CrearTarifaView,
     EditarTarifaView,
-    EliminarTarifaView,
     ListarTarrifas,
     ReservaListView,
     ReservaCreateView,
@@ -33,7 +32,6 @@ urlpatterns = [
     path('tarifas/', ListarTarrifas.as_view(), name='listar_tarifas'),
     path('tarifas/crear/', CrearTarifaView.as_view(), name='crear_tarifa'),
     path('tarifas/<int:pk>/editar/', EditarTarifaView.as_view(), name='editar_tarifa'),
-    path('tarifas/<int:pk>/eliminar/', EliminarTarifaView.as_view(), name='eliminar_tarifa'),
     path('actualizar/<int:pk>/', ActualizarHorarioView.as_view(), name='actualizar_horario'),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/logout/', custom_logout, name='logout'),
