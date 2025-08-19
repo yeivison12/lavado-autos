@@ -45,10 +45,6 @@
                     <td>{{ tarifa.fecha_creacion|date:"d M Y" }}</td>
                     <td>
                         <a href="{% url 'editar_tarifa' tarifa.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-                        <a href="{% url 'eliminar_tarifa' tarifa.pk %}" class="btn btn-sm btn-outline-danger"
-                           onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarifa?');">
-                           Eliminar
-                        </a>
                     </td>
                 </tr>
                 {% endfor %}
